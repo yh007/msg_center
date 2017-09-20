@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:task="http://www.springframework.org/schema/task" xmlns:util="http://www.springframework.org/schema/util"  
+	xmlns:p="http://www.springframework.org/schema/p" xsi:schemaLocation="
+   		http://www.springframework.org/schema/beans 
+   		http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+   		http://www.springframework.org/schema/tx 
+   		http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+   		http://www.springframework.org/schema/aop 
+   		http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+   		http://www.springframework.org/schema/context
+   		http://www.springframework.org/schema/context/spring-context-4.0.xsd 
+ 		http://www.springframework.org/schema/task 
+		http://www.springframework.org/schema/task/spring-task-4.0.xsd
+		http://www.springframework.org/schema/util 
+		http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+
+	<bean id="context" class="cn.com.citycloud.live.common.utils.SpringContext" lazy-init="false" />
+
+	<context:annotation-config />
+	<!-- 自动扫描组件配置 -->
+	<context:component-scan base-package="cn.com.citycloud.live.mgc">
+		<!-- <context:exclude-filter type="regex" expression="cn.com.citycloud.lives.business.dao.mybatis.*" />-->
+	</context:component-scan>
+
+	<!-- properties文件配置 -->
+	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:config/${spring.profiles.active}/jms.properties</value>
+				<value>classpath:config/${spring.profiles.active}/mail.properties</value>
+				<value>classpath:config/${spring.profiles.active}/mybatis.properties</value>
+				<value>classpath:config/${spring.profiles.active}/env.properties</value>
+				<value>classpath:config/${spring.profiles.active}/dubbo.properties</value>
+				<value>classpath:config/${spring.profiles.active}/mongodb.properties</value>
+				<value>classpath:config/${spring.profiles.active}/sms.properties</value>
+			</list>
+		</property>
+		<property name="fileEncoding">
+			<value>UTF-8</value>
+		</property>
+	</bean>
+
+	<!-- 线程池配置 -->
+	<bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor" p:corePoolSize="50" p:maxPoolSize="500" />
+
+	<bean id="zkClusterFactory" class="cn.com.citycloud.frame.lock.zk.ZkClusterFactory">
+    	<property name="connStr" value="${lock.zookeeper.address}"></property>
+    </bean>
+
+	<bean id="listenersNotice" class="java.util.HashMap">  
+	    <constructor-arg>  
+	       <map>  
+	         <entry key="sms" value="smsService"></entry>
+	       </map>  
+	    </constructor-arg>  
+	</bean>
+	
+	<bean id="listenerConfig" class="cn.com.citycloud.live.common.zk.ListenerConfig" depends-on="zkClusterFactory">
+		<constructor-arg ref="zkClusterFactory"/>
+		<constructor-arg ref="listenersNotice"/>
+	</bean>
+
+	<import resource="../dubbo/applicationProvider.xml" />
+
+</beans>

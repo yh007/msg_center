@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+			xsi:schemaLocation="http://www.springframework.org/schema/data/mongo
+			http://www.springframework.org/schema/data/mongo/spring-mongo-1.4.xsd
+			http://www.springframework.org/schema/beans
+			http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+	<mongo:mongo host="${mongo.host}" port="${mongo.port}" write-concern="JOURNAL_SAFE">
+		<mongo:options 
+			connections-per-host="10"
+			connect-timeout="5000" 
+			max-wait-time="9000" 
+			threads-allowed-to-block-for-connection-multiplier="20"
+		/>
+	</mongo:mongo>
+
+	<mongo:db-factory id="mongoDbFactory" mongo-ref="mongo" dbname="${mongo.databaseName}"
+			username="${mongo.username}" password="${mongo.password}" />
+
+    <!-- mongodb的主要操作对象，所有对mongodb的增删改查的操作都是通过它完成 -->
+    <bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
+        <constructor-arg name="mongoDbFactory" ref="mongoDbFactory" />
+    </bean>
+  
+    <!-- 映射转换器，扫描back-package目录下的文件，根据注释，把它们作为mongodb的一个collection的映射
+    <mongo:mapping-converter base-package="cn.com.citycloud.live.mgc.sms.entity" /> -->  
+  
+    <!-- mongodb bean的仓库目录，会自动扫描扩展了MongoRepository接口的接口进行注入 
+    <mongo:repositories base-package="cn.com.citycloud.live.mgc.sms.service" />-->
+
+
+</beans>

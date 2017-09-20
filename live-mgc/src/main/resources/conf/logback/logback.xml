@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false" scan="true" scanPeriod="1000 seconds">
+	<timestamp key="date" datePattern="yyyyMMdd" />
+	<!-- 控制台输出 -->
+	<appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%date [%thread] %-5level %logger{80} - %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<!-- 时间滚动输出 level为 DEBUG 日志 -->
+	<appender name="file—debug"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>DEBUG</level>
+		</filter>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<FileNamePattern>${path}/live-mgc_debug.%d{yyyy-MM-dd}.log</FileNamePattern>
+			<MaxHistory>30</MaxHistory>
+		</rollingPolicy>
+		<encoder>
+			<pattern>%date [%thread] %-5level %logger{80} - %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<!-- 时间滚动输出 level为 ERROR 日志 -->
+	<appender name="file—error"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>ERROR</level>
+			<onMatch>ACCEPT</onMatch>
+			<onMismatch>DENY </onMismatch>
+		</filter>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<FileNamePattern>${path}/live-mgc_error.%d{yyyy-MM-dd}.log</FileNamePattern>
+			<MaxHistory>30</MaxHistory>
+		</rollingPolicy>
+		<encoder>
+			<pattern>%date [%thread] %-5level %logger{80} - %msg%n</pattern>
+		</encoder>
+	</appender>
+	
+	<!-- 日志存入mongodb -->
+    <appender name="mongodb" class="cn.com.citycloud.live.common.logback.MongoDBAppender"> 
+        <host>${mongo.host}</host>
+        <port>${mongo.port}</port>
+        <username>${mongo.username}</username>
+        <password>${mongo.password}</password>
+        <dbName>${mongo.databaseName}</dbName>
+        <collectionName>systemlog</collectionName>
+        <projectName>live-mgc</projectName>
+    </appender> 
+	
+	<root level="${level}">
+		<appender-ref ref="stdout" />
+		<appender-ref ref="file—debug" />
+		<appender-ref ref="file—error" />
+		<appender-ref ref="mongodb" />
+	</root>
+	
+	<logger name="com.ibatis" level="debug" />
+	<logger name="java.sql.Connection" level="debug" />
+	<logger name="java.sql.PreparedStatement" level="debug" />
+	<logger name="org.springframework" level="info" />
+	<logger name="org.quartz" level="info" />
+	<logger name="cn.com.citycloud.live.security" level="info" />
+	<logger name="cn.com.citycloud.frame.mongo" level="debug" />
+	
+	<logger name="org.apache.commons" level="error" />
+	<logger name="org.apache.zookeeper" level="error" />
+	<logger name="org.apache.shiro" level="error" />
+	<logger name="org.apache.activemq" level="error" />
+	<logger name="org.apache.curator" level="warn" />
+	<logger name="org.mybatis.spring" level="warn" />
+     
+</configuration>

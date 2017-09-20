@@ -1,0 +1,23 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>邮箱</title>
+<style>
+body{font: 12px "宋体", Arial, Helvetica, sans-serif; color:#000000;}
+p{ margin:0 0 0 30px; padding:0; line-height:26px;}
+.title{ font-size:14px; font-weight:bold; margin-top:50px;}
+span{ color:#999999;}
+.foot{ margin-top:80px;}
+</style>
+</head>
+
+<body>
+<p class="title">尊敬的$!{user.name}：</p>
+<p>您好！</p>
+
+<p>欢迎加入千里目直播平台！您的登录用户名是：$!{user.username}，请点击<a href="$!{checkUrl}"><b>这里</b></a>完成邮箱验证(链接将在24小时后失效)。</p>
+<p style="color:#888; font-size:12px; line-height:16px;">(如果以上链接无法点击，请将地址复制到你的浏览器(如IE)的地址栏进入千里目直播平台，链接地址：$!{checkUrl}) </p>
+<p>本条信息是系统自动发送，请勿回复！</p>
+</body>
+</html>

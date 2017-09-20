@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+   		http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+   		http://www.springframework.org/schema/context
+   		http://www.springframework.org/schema/context/spring-context-4.0.xsd
+   		http://www.springframework.org/schema/aop 
+   		http://www.springframework.org/schema/aop/spring-aop-4.0.xsd 
+		http://www.springframework.org/schema/util 
+		http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+
+	<!-- jms客户端配置  -->
+	<bean id="jmsPooledConnectionFactory" class="org.apache.activemq.pool.PooledConnectionFactory" destroy-method="stop">
+		<property name="connectionFactory">
+			<bean class="org.apache.activemq.spring.ActiveMQConnectionFactory">
+				<property name="useBeanNameAsClientIdPrefix" value="true"/>
+				<property name="brokerURL" value="failover:(tcp://${jms.server.ip}:${jms.server.port})?initialReconnectDelay=60000&amp;timeout=9000" />
+			</bean>
+		</property> 
+	</bean>
+    
+	<!-- 邮件发送消息 -->
+	<bean id="liveMailListener" class="cn.com.citycloud.live.mgc.listener.MqMailSendListener" />
+	<bean id="mailMessageConverter" class="cn.com.citycloud.live.mgc.utils.MailMessageConvert" />
+	
+	<bean id="liveMailMessageListenerContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+        <property name="connectionFactory" ref="jmsPooledConnectionFactory" />
+        <property name="destination" ref="liveMailDestination" />
+        <property name="messageListener" ref="liveMailListener" />
+    </bean>
+    
+  	<bean id="mailQueue" class="cn.com.citycloud.live.common.utils.MqQueueNameParser">
+    	<property name="queueName" value="live-mail"></property>
+    </bean>
+    
+	<bean id="liveMailDestination" class="org.apache.activemq.command.ActiveMQQueue">
+        <constructor-arg ref="mailQueue" />
+    </bean>
+
+    <bean id="liveMailJmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+        <property name="connectionFactory" ref="jmsPooledConnectionFactory" />
+        <property name="defaultDestination" ref="liveMailDestination" />
+    	<property name="messageConverter" ref="mailMessageConverter"/>  
+    </bean>
+
+ 
+	<!-- 短信发送消息 -->
+	<bean id="liveSmsListener" class="cn.com.citycloud.live.mgc.listener.MqSmsSendListener" />
+	<bean id="liveSmsMessageListenerContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+        <property name="connectionFactory" ref="jmsPooledConnectionFactory" />
+        <property name="destination" ref="liveSmsDestination" />
+        <property name="messageListener" ref="liveSmsListener" />
+    </bean>
+    
+    <bean id="smsQueue" class="cn.com.citycloud.live.common.utils.MqQueueNameParser">
+    	<property name="queueName" value="live-sms"></property>
+    </bean>
+    
+	<bean id="liveSmsDestination" class="org.apache.activemq.command.ActiveMQQueue">
+        <constructor-arg ref="smsQueue" />
+    </bean>
+
+    <bean id="liveSmsJmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+        <property name="connectionFactory" ref="jmsPooledConnectionFactory" />
+        <property name="defaultDestination" ref="liveSmsDestination" />
+    	<property name="messageConverter" ref="mailMessageConverter"/>  
+    </bean>
+</beans>

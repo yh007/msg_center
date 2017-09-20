@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.com.citycloud.live.mgc.mail.dao.MailTemplatesDao">
+	
+	<resultMap id="mailTemplateMap" type="cn.com.citycloud.live.mgc.mail.entity.MailTemplates">
+		<result property="code" column="code" /> 
+		<result property="subject" column="subject" /> 
+		<result property="template" column="template" /> 
+	</resultMap>
+	
+	<sql id="mailTemplateColumns">code,subject,template</sql>
+	
+	<select id="selectAll" resultMap="mailTemplateMap">
+		select 
+		<include refid="mailTemplateColumns"/>
+		from mail_templates
+	</select>
+	
+	
+</mapper>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+	http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+	
+	<!-- 应用名称 -->
+	<dubbo:application name="live-mgc-service" />
+	
+	<!-- 扫描路径 -->
+	<dubbo:annotation package="cn.com.citycloud.live.mgc.service.dubbo" />
+	
+	<!-- 注册地址 -->
+	<dubbo:registry address="${dubbo.zookeeper.address}" /><!-- zookeeper://192.168.133.125:2181 -->
+	
+	<!-- 协议 -->
+	<dubbo:protocol name="dubbo" port="-1" />
+	
+	<!-- 用rest协议暴露服务 -->
+	<dubbo:protocol name="rest" port="8081" server="servlet" contextpath="live-mgc"/>
+	
+	<!-- 发送邮件 -->
+	<dubbo:service  protocol="dubbo" interface="cn.com.citycloud.live.mgc.intf.IMailSend" ref="mailSend" retries="0" timeout="30000"/>
+	<!-- 发送短信 -->
+	<dubbo:service  protocol="dubbo,rest" interface="cn.com.citycloud.live.mgc.intf.ISmsSend" ref="smsSend"  retries="0" timeout="30000"/>
+	
+</beans>
